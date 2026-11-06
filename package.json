@@ -1,0 +1,7 @@
+{
+  "name": "sachi-wfh-plan",
+  "version": "1.0.0",
+  "description": "Work-from-home plan calendar with a password-protected edit mode. Yellow and black theme with an interactive background.",
+  "private": true,
+  "engines": { "node": ">=18" }
+}

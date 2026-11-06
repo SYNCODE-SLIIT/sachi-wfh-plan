@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work From Home Plan</title>
+<style>
+  :root {
+    --yellow: #ffd400; --yellow-dark: #c99a00; --black: #0d0d0d; --ink: #1a1a1a; --line: #333;
+    --text: #f4f4f4; --muted: #a8a8a8; --danger: #ff6b5e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; color: var(--text); background-color: var(--yellow);
+    background-image: radial-gradient(rgba(0,0,0,.12) 1.2px, transparent 1.2px); background-size: 18px 18px;
+    font: 15px/1.5 "Segoe UI", "Nirmala UI", system-ui, -apple-system, sans-serif; min-height: 100vh;
+  }
+  .wrap { max-width: 1050px; margin: 0 auto; padding: 36px 16px 110px; position: relative; z-index: 1; }
+  #bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+  .hero { text-align: center; margin-bottom: 28px; color: #000; }
+  .tag { display: inline-block; background: var(--black); color: var(--yellow); font-weight: 700; font-size: 12px;
+         letter-spacing: .14em; text-transform: uppercase; padding: 7px 14px; }
+  .hero h1 { margin: 16px 0 6px; font-size: clamp(34px, 7vw, 54px); font-weight: 800; letter-spacing: -.02em; line-height: 1.05; }
+  @media (min-width: 760px) { .hero h1 br { display: none; } }   /* one line on desktop, two on mobile */
+  .hero .rule { width: 90px; height: 4px; background: #000; margin: 14px auto; }
+  .hero .sub { font-weight: 600; }
+  .hero .sub2 { font-size: 13px; opacity: .75; }
+
+  .layout { display: grid; grid-template-columns: 370px 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+  .panel { background: var(--black); padding: 20px; box-shadow: 7px 7px 0 var(--yellow-dark); }
+  .label { color: var(--yellow); font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+
+  .calhead { display: flex; justify-content: space-between; align-items: center; margin: 8px 0 12px; }
+  .calhead b { font-size: 19px; font-weight: 700; }
+  .nav { border: 2px solid var(--yellow); background: transparent; color: var(--yellow); width: 34px; height: 34px; cursor: pointer; font-size: 18px; font-weight: 700; }
+  .nav:hover { background: var(--yellow); color: #000; }
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .dow { text-align: center; font-size: 11px; color: var(--muted); padding: 4px 0; text-transform: uppercase; letter-spacing: .08em; }
+  .cell { aspect-ratio: 1; border: 1px solid transparent; background: transparent; color: var(--text);
+          cursor: pointer; font: inherit; font-weight: 600; position: relative; display: grid; place-items: center; }
+  .cell:hover { background: #262626; }
+  .cell.out { color: #666; }
+  .cell.inplan { background: rgba(255, 212, 0, .16); }
+  .cell.today { border-color: var(--yellow); }
+  .cell.sel { background: var(--yellow); color: #000; }
+  .cell.has::after { content: ""; position: absolute; bottom: 5px; width: 6px; height: 6px; background: var(--yellow); }
+  .cell.sel.has::after { background: #000; }
+  .legend { font-size: 12px; color: var(--muted); margin-top: 14px; display: flex; gap: 16px; flex-wrap: wrap; }
+
+  .daytitle { margin: 6px 0 2px; font-size: 24px; font-weight: 700; }
+  .daysub { color: var(--muted); font-size: 13px; margin-bottom: 14px; min-height: 1.2em; }
+  .entry { border-left: 5px solid var(--yellow); background: var(--ink); padding: 14px 16px; margin-bottom: 12px; }
+  .entry .tm { font-size: 13px; color: var(--yellow); font-weight: 700; letter-spacing: .04em; }
+  .entry .tt { font-weight: 700; font-size: 18px; margin-top: 2px; }
+  .entry .ds { color: #cfcfcf; margin-top: 4px; white-space: pre-wrap; }
+  .empty { color: var(--muted); text-align: center; padding: 32px 10px; border: 2px dashed var(--line); }
+
+  input, textarea { font: inherit; color: var(--text); background: var(--black); border: 1px solid #444; border-radius: 0; padding: 8px 10px; min-width: 0; color-scheme: dark; }
+  input:focus, textarea:focus { outline: 2px solid var(--yellow); outline-offset: 0; }
+  .ed { display: grid; gap: 8px; }
+  .times { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .times input { width: 128px; }
+  textarea { width: 100%; resize: vertical; min-height: 64px; }
+  .x { background: none; border: 1px solid var(--danger); color: var(--danger); cursor: pointer; font: inherit; font-size: 13px; padding: 6px 12px; margin-left: auto; }
+  .x:hover { background: var(--danger); color: #000; }
+  .add { width: 100%; border: 2px dashed var(--yellow); background: transparent; color: var(--yellow); padding: 12px; cursor: pointer; font: inherit; font-weight: 700; }
+  .add:hover { background: rgba(255, 212, 0, .1); }
+
+  .btn { background: var(--yellow); color: #000; border: 0; font: inherit; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+         font-size: 13px; padding: 11px 24px; cursor: pointer; }
+  .btn:hover { background: #ffe04d; }
+  .btn:disabled { opacity: .6; cursor: default; }
+  .btn.ghost { background: transparent; color: var(--yellow); border: 2px solid var(--yellow); padding: 9px 18px; }
+  .btn.ghost:hover { background: rgba(255,212,0,.12); }
+  .savebar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .note { color: var(--yellow); font-size: 13px; font-weight: 600; }
+  .note.err { color: var(--danger); }
+  .status { color: var(--muted); font-size: 13px; margin-top: 12px; min-height: 1em; }
+
+  /* name tag, bottom right */
+  body { position: relative; }
+  .owner { position: absolute; right: 18px; bottom: 14px; z-index: 20; background: none; color: var(--yellow); border: 0;
+           font: inherit; font-size: 15px; font-weight: 800; letter-spacing: .02em; padding: 6px 4px; cursor: pointer; transition: color .15s; }
+  .owner:hover { color: #000; }
+  .owner.on::before { content: "● "; }
+
+  /* password popup */
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; place-items: center; z-index: 50; padding: 16px; }
+  .overlay.open { display: grid; }
+  .modal { background: var(--black); width: 100%; max-width: 360px; padding: 24px; box-shadow: 8px 8px 0 var(--yellow-dark); }
+  .modal h3 { margin: 6px 0 4px; font-size: 22px; }
+  .modal p { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+  .modal input { width: 100%; font-size: 20px; letter-spacing: .4em; text-align: center; }
+  .modal .row { display: flex; gap: 10px; margin-top: 14px; }
+  .modal .row .btn { flex: 1; }
+  .err { color: var(--danger); font-size: 13px; min-height: 1.3em; margin-top: 8px; }
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="wrap">
+  <header class="hero">
+    <span class="tag">■ Special work-from-home arrangement</span>
+    <h1>Sachithra Sandbox <br>WFH Plan</h1>
+    <div class="rule"></div>
+    <div class="sub">Monday 9 – Thursday 12 November 2026</div>
+    <div class="sub2">Pick a date to see my work for that day</div>
+  </header>
+
+  <div class="layout">
+    <section class="panel">
+      <div class="label">Calendar</div>
+      <div class="calhead">
+        <button class="nav" id="prev" aria-label="Previous month">‹</button>
+        <b id="month"></b>
+        <button class="nav" id="next" aria-label="Next month">›</button>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="legend"><span>■ has work</span><span>Shaded = WFH period</span></div>
+    </section>
+
+    <section class="panel">
+      <div class="label" id="modeLabel">Work for the day</div>
+      <h2 class="daytitle" id="daytitle"></h2>
+      <div class="daysub" id="daysub"></div>
+      <div id="entries"></div>
+      <div id="savebar"></div>
+      <div class="status" id="status"></div>
+    </section>
+  </div>
+</div>
+
+<button class="owner" id="ownerBtn">Sachithra Wijesinghe</button>
+
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mtitle">
+    <div class="label">Owner only</div>
+    <h3 id="mtitle">Enter your password</h3>
+    <p>Type your password to open edit mode.</p>
+    <input id="pw" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="••••">
+    <div class="err" id="pwErr"></div>
+  </div>
+</div>
+
+<script>
+  const PLAN_START = "2026-11-09", PLAN_END = "2026-11-12";
+  const PASSWORD_LENGTH = 4;   // digits in the edit password. The password itself is checked on the server (EDIT_PASSWORD).
+  let editPassword = "";       // kept in memory only while edit mode is open
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+  const iso = dt => dt.getFullYear() + "-" + String(dt.getMonth()+1).padStart(2,"0") + "-" + String(dt.getDate()).padStart(2,"0");
+  const parse = s => new Date(s + "T00:00:00");
+  const todayStr = iso(new Date());
+  const t12 = t => { if (!t) return ""; const [h, m] = t.split(":").map(Number);
+    return ((h % 12) || 12) + ":" + String(m).padStart(2,"0") + " " + (h < 12 ? "AM" : "PM"); };
+
+  let EDIT = false;          // edit mode (after the password popup)
+  let entries = [];          // saved entries [{id, date, from, to, title, desc}]
+  let selected = PLAN_START;
+  let view = parse(selected); view.setDate(1);
+  let loaded = false;
+
+  // Unsaved changes, applied together when "Save changes" is pressed.
+  let draft = { edits: {}, dels: new Set(), adds: [] };
+  let nextTmp = 1;
+  const dirty = () => Object.keys(draft.edits).length || draft.dels.size || draft.adds.length;
+  const resetDraft = () => { draft = { edits: {}, dels: new Set(), adds: [] }; };
+
+  const merged = () => [
+    ...entries.filter(e => !draft.dels.has(e.id)).map(e => ({ ...e, ...(draft.edits[e.id] || {}) })),
+    ...draft.adds,
+  ];
+  const sourceList = () => EDIT ? merged() : entries;
+  const forDay = ds => sourceList().filter(e => e.date === ds)
+    .sort((a, b) => (a.from || "").localeCompare(b.from || ""));
+  const setStatus = (msg, err) => { $("status").textContent = msg || ""; $("status").style.color = err ? "var(--danger)" : ""; };
+
+  function renderCalendar() {
+    $("month").textContent = view.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+    const first = new Date(view), offset = (first.getDay() + 6) % 7;
+    first.setDate(1 - offset);
+    let html = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(n => `<div class="dow">${n}</div>`).join("");
+    for (let i = 0; i < 42; i++) {
+      const dt = new Date(first); dt.setDate(first.getDate() + i);
+      const ds = iso(dt);
+      const cls = ["cell",
+        dt.getMonth() !== view.getMonth() ? "out" : "",
+        ds >= PLAN_START && ds <= PLAN_END ? "inplan" : "",
+        ds === todayStr ? "today" : "",
+        ds === selected ? "sel" : "",
+        forDay(ds).length ? "has" : ""].join(" ");
+      html += `<button class="${cls}" data-d="${ds}">${dt.getDate()}</button>`;
+    }
+    $("grid").innerHTML = html;
+    $("grid").querySelectorAll("[data-d]").forEach(b => b.onclick = () => {
+      selected = b.dataset.d;
+      const dt = parse(selected);
+      if (dt.getMonth() !== view.getMonth()) view = new Date(dt.getFullYear(), dt.getMonth(), 1);
+      render(true);
+    });
+  }
+
+  function renderDay(force) {
+    $("daytitle").textContent = parse(selected).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    $("modeLabel").textContent = EDIT ? "Edit mode · work for the day" : "Work for the day";
+    const list = forDay(selected);
+    $("daysub").textContent = list.length ? list.length + (list.length === 1 ? " work item" : " work items") : "";
+
+    // Don't rebuild the form while typing.
+    if (!force && EDIT && $("entries").contains(document.activeElement) && document.activeElement.matches("input,textarea")) return;
+
+    let html = list.map(e => {
+      const key = e.id ?? e.tmp;
+      if (!EDIT) return `<div class="entry">
+        <div class="tm">${t12(e.from)}${e.to ? " – " + t12(e.to) : ""}</div>
+        <div class="tt">${esc(e.title)}</div>${e.desc ? `<div class="ds">${esc(e.desc)}</div>` : ""}</div>`;
+      return `<div class="entry" data-key="${key}"><div class="ed">
+        <div class="times"><input type="time" data-f="from" value="${esc(e.from)}"> <span class="label">to</span>
+          <input type="time" data-f="to" value="${esc(e.to)}">
+          <button class="x" data-del="${key}">Delete</button></div>
+        <input data-f="title" value="${esc(e.title)}" placeholder="Title">
+        <textarea data-f="desc" placeholder="Short description">${esc(e.desc)}</textarea></div></div>`;
+    }).join("");
+    if (!list.length) html = `<div class="empty">${!loaded ? "Loading…" : EDIT ? "Nothing planned for this date yet." : "No work planned for this date."}</div>`;
+    if (EDIT) html += `<button class="add" id="add">+ Add work for this date</button>`;
+    $("entries").innerHTML = html;
+
+    if (EDIT) {
+      $("entries").querySelectorAll("[data-f]").forEach(el => el.oninput = () => {
+        const key = el.closest(".entry").dataset.key;
+        const add = draft.adds.find(a => a.tmp === key);
+        if (add) add[el.dataset.f] = el.value;
+        else draft.edits[key] = { ...(draft.edits[key] || {}), [el.dataset.f]: el.value };
+        setStatus("");
+        renderSavebar();
+      });
+      $("entries").querySelectorAll("[data-del]").forEach(b => b.onclick = () => {
+        const key = b.dataset.del;
+        const i = draft.adds.findIndex(a => a.tmp === key);
+        if (i >= 0) draft.adds.splice(i, 1); else { draft.dels.add(key); delete draft.edits[key]; }
+        setStatus(""); render(true);
+      });
+      $("add").onclick = () => {
+        draft.adds.push({ tmp: "new" + (nextTmp++), date: selected, from: "09:00", to: "10:00", title: "", desc: "" });
+        setStatus(""); render(true);
+      };
+    }
+  }
+
+  function renderSavebar() {
+    if (!EDIT) { $("savebar").innerHTML = ""; return; }
+    if (!$("saveAll")) {
+      $("savebar").innerHTML = `<div class="savebar">
+        <button class="btn" id="saveAll">Save changes</button>
+        <button class="btn ghost" id="exitEdit">Exit edit mode</button>
+        <span class="note" id="saveNote"></span></div>`;
+      $("saveAll").onclick = saveAll;
+      $("exitEdit").onclick = () => {
+        if (dirty() && $("exitEdit").dataset.sure !== "1") {
+          $("exitEdit").dataset.sure = "1"; $("exitEdit").textContent = "Discard & exit";
+          $("saveNote").className = "note err"; $("saveNote").textContent = "You have unsaved changes."; return;
+        }
+        setEdit(false);
+      };
+    }
+    const n = $("saveNote");
+    if (n && !n.dataset.keep) { n.className = "note"; n.textContent = dirty() ? "Unsaved changes" : ""; }
+  }
+
+  async function saveAll() {
+    const btn = $("saveAll"), note = $("saveNote");
+    const bad = draft.adds.filter(a => !a.title.trim());
+    if (bad.length) { note.className = "note err"; note.textContent = "Please add a title to each new entry."; return; }
+    if (!dirty()) { note.className = "note"; note.textContent = "Nothing to save."; return; }
+    btn.disabled = true; note.className = "note"; note.textContent = "Saving…";
+    try {
+      const list = merged().map(e => ({ id: e.id, date: e.date, from: e.from, to: e.to, title: e.title, desc: e.desc }));
+      const r = await fetch("/api/entries", {
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: editPassword, entries: list }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error || "Save failed");
+      entries = j.entries;
+      resetDraft();
+      render(true);
+      const n2 = $("saveNote"); n2.dataset.keep = "1"; n2.className = "note"; n2.textContent = "Saved ✓ – everyone can see it now";
+      setTimeout(() => { n2.dataset.keep = ""; if (!dirty()) n2.textContent = ""; }, 3500);
+    } catch (e) {
+      note.className = "note err";
+      note.textContent = "Could not save: " + e.message;
+    }
+    if ($("saveAll")) $("saveAll").disabled = false;
+  }
+
+  function setEdit(on) {
+    EDIT = on; resetDraft(); if (!on) editPassword = "";
+    $("ownerBtn").classList.toggle("on", on);
+    $("ownerBtn").textContent = "Sachithra Wijesinghe" + (on ? " · editing" : "");
+    $("savebar").innerHTML = ""; setStatus("");
+    render(true);
+  }
+
+  function render(force) { renderCalendar(); renderDay(force); renderSavebar(); }
+
+  $("prev").onclick = () => { view = new Date(view.getFullYear(), view.getMonth() - 1, 1); renderCalendar(); };
+  $("next").onclick = () => { view = new Date(view.getFullYear(), view.getMonth() + 1, 1); renderCalendar(); };
+
+  // password popup
+  const openPw = () => { $("pw").value = ""; $("pwErr").textContent = ""; $("overlay").classList.add("open"); setTimeout(() => $("pw").focus(), 30); };
+  const closePw = () => $("overlay").classList.remove("open");
+  $("ownerBtn").onclick = () => { if (EDIT) { if (!dirty()) setEdit(false); else { $("exitEdit") && $("exitEdit").click(); } } else openPw(); };
+  $("overlay").onclick = e => { if (e.target === $("overlay")) closePw(); };
+  // Opens edit mode by itself as soon as the right password has been typed.
+  let checking = false;
+  $("pw").oninput = async () => {
+    const v = $("pw").value;
+    $("pwErr").textContent = "";
+    if (v.length < PASSWORD_LENGTH || checking) return;
+    checking = true;
+    try {
+      const r = await fetch("/api/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: v }) });
+      if (r.ok) { editPassword = v; closePw(); setEdit(true); }
+      else {
+        const j = await r.json().catch(() => ({}));
+        $("pwErr").textContent = r.status === 429 ? (j.error || "Too many attempts.") : "Wrong password. Try again.";
+        $("pw").value = "";
+      }
+    } catch (e) { $("pwErr").textContent = "Could not check the password. Try again."; $("pw").value = ""; }
+    checking = false;
+  };
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closePw(); });
+
+  // Interactive background: floating black balls joined by lines. They drift, move away from the cursor/finger,
+  // link to it when close, and burst apart on click. Skipped for people who prefer reduced motion.
+  (() => {
+    const c = $("bg"), ctx = c.getContext("2d");
+    if (!ctx || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let w = 0, h = 0, pts = [];
+    const mouse = { x: -9999, y: -9999 };
+    const mk = () => ({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - .5) * .6, vy: (Math.random() - .5) * .6, r: 2 + Math.random() * 5 });
+    function size() {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      w = innerWidth; h = innerHeight;
+      c.width = w * dpr; c.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const n = Math.round(Math.min(90, (w * h) / 15000));
+      while (pts.length < n) pts.push(mk());
+      pts.length = n;
+    }
+    addEventListener("resize", size); size();
+    addEventListener("pointermove", e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+    addEventListener("pointerleave", () => { mouse.x = mouse.y = -9999; });
+    addEventListener("pointerdown", e => {
+      for (const p of pts) {
+        const dx = p.x - e.clientX, dy = p.y - e.clientY, d = Math.hypot(dx, dy) || 1;
+        if (d < 220) { const f = (220 - d) / 220 * 9; p.vx += dx / d * f; p.vy += dy / d * f; }
+      }
+    });
+    function frame() {
+      ctx.clearRect(0, 0, w, h);
+      for (const p of pts) {
+        const dx = p.x - mouse.x, dy = p.y - mouse.y, d = Math.hypot(dx, dy);
+        if (d < 130 && d > 0) { const f = (130 - d) / 130 * .6; p.vx += dx / d * f; p.vy += dy / d * f; }
+        const sp = Math.hypot(p.vx, p.vy);
+        if (sp > 1.1) { p.vx *= .96; p.vy *= .96; }
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < -10) p.x = w + 10; else if (p.x > w + 10) p.x = -10;
+        if (p.y < -10) p.y = h + 10; else if (p.y > h + 10) p.y = -10;
+      }
+      ctx.lineWidth = 1;
+      for (let i = 0; i < pts.length; i++) {
+        const a = pts[i];
+        for (let j = i + 1; j < pts.length; j++) {
+          const b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y);
+          if (d < 130) { ctx.strokeStyle = "rgba(0,0,0," + (0.28 * (1 - d / 130)) + ")"; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+        }
+        const md = Math.hypot(a.x - mouse.x, a.y - mouse.y);
+        if (md < 190) { ctx.strokeStyle = "rgba(0,0,0," + (0.55 * (1 - md / 190)) + ")"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke(); ctx.lineWidth = 1; }
+      }
+      ctx.fillStyle = "rgba(0,0,0,.82)";
+      for (const p of pts) { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832); ctx.fill(); }
+      requestAnimationFrame(frame);
+    }
+    frame();
+  })();
+
+  render();
+
+  async function load(first) {
+    try {
+      const r = await fetch("/api/entries", { cache: "no-store" });
+      if (!r.ok) throw new Error("load failed");
+      entries = (await r.json()).entries || [];
+      loaded = true;
+      if (first) setStatus("");
+      render(first || !EDIT);   // while editing, don't disturb the form
+    } catch (e) {
+      if (first) { loaded = true; setStatus("Could not load the plan right now.", true); render(true); }
+    }
+  }
+  load(true);
+  // Visitors pick up new changes by themselves every 30 seconds (and never while you have unsaved edits).
+  setInterval(() => { if (!document.hidden && !(EDIT && dirty())) load(false); }, 30000);
+</script>
+</body>
+</html>
